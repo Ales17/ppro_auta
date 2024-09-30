@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${edit} ? 'Editing' + ${car.spz} : 'Creating a new car'"></title>
+</head>
+<body>
+    <a class="btn" th:href="@{/edit/{index}(index=${id})}">EDIT</a>
+    <a class="btn" th:href="@{/delete/{index}(index=${id})}">DELETE</a>
+    <div th:object="${car}">
+        <div th:text="*{spz}"></div>
+        <div th:text="*{color}"></div>
+        <div th:text="*{tankVolume}"></div>
+        <div th:text="*{numberOfSeats}"></div>
+    </div>
+
+
+
+<form th:action="@{/save/}" method="POST" th:object="${car}">
+    <input type="hidden" id="id" name="id" th:field="${id}">
+
+    <label for="spz">SPZ number</label>
+    <input type="text" id="spz" name="spz" th:field="*{spz}">
+
+    <label for="color">Color</label>
+    <input type="text" id="color" name="color" th:fied="*{color}">
+
+    <label for="numberOfSeats">Number of seats</label>
+    <input type="number" id="numberOfSeats" name="numberOfSeats" th:field="*{numberOfSeats}">
+
+    <input type="submit" value="Save">
+</form>
+
+</body>
+</html>
