@@ -2,7 +2,8 @@ package cz.ales17.ppro_auta.controller;
 
 import com.github.javafaker.Faker;
 import cz.ales17.ppro_auta.model.Car;
-import jakarta.validation.Valid;
+import cz.ales17.ppro_auta.service.CarService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,28 +11,26 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 @Controller
 public class CarController {
 
-    private List<Car> cars = new ArrayList<Car>();
+    private CarService carService;
+
+    @Autowired
+    public CarController(CarService carService) {
+        this.carService = carService;
+    }
 
     @GetMapping("/")
     public String list(Model m) {
-        Faker faker = new Faker();
-        Car c = new Car(1L, "JCA" + + faker.number().numberBetween(1000,9999), "green", 40.0F, 5);
-        cars.add(c);
-        m.addAttribute("cars", cars);
+        m.addAttribute("cars", carService.getAllCars());
         return "list";
     }
 
     @GetMapping("/detail/{id}")
     public String carDetail(@PathVariable int id, Model m) {
-        if (id > -1 && id < cars.size()) {
-            Car c = cars.get(id);
+        Car c = carService.getCarById(id);
+        if (c != null) {
             m.addAttribute("car", c);
             return "detail";
         } else {
@@ -41,17 +40,18 @@ public class CarController {
 
     @GetMapping("/create")
     public String create(Model m) {
-        m.addAttribute("car", new Car());
+        Car c = new Car();
+        m.addAttribute("car", c);
         m.addAttribute("edit", false);
         return "edit";
     }
 
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable int id, Model m) {
-        if (id > -1 && id < cars.size()) {
-            Car c = cars.get(id);
-            c.setId((long) id);
-            m.addAttribute("car", cars.get(id));
+        Car c = carService.getCarById(id);
+        if (c != null) {
+            c.setId(id);
+            m.addAttribute("car", c);
             m.addAttribute("edit", true);
             return "edit";
         }
@@ -59,22 +59,25 @@ public class CarController {
     }
 
     @PostMapping("/save")
-    public String delete(Model m, @Valid @ModelAttribute Car c) {
-        // TODO Validaton
-        if (c.getId() > -1 && c.getId() < cars.size()) {
-            cars.remove(c);
+    public String saveCar(Model m, @ModelAttribute Car c) {
+        if(c.getId() != 0) {
+            carService.updateCar(c);
+        } else {
+            Faker faker = new Faker();
+            int random = faker.number().numberBetween(100,999);
+            c.setId(random);
+            carService.addCar(c);
         }
-        cars.add(c);
+
+
+
         return "redirect:/";
     }
 
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable int id) {
-        if (id > -1 && id < cars.size()) {
-            Car c = cars.get(id);
-            cars.remove(c);
-        }
+        carService.deleteCar(id);
         return "redirect:/";
     }
 }

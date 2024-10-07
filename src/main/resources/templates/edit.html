@@ -16,14 +16,14 @@
 
 
 
-<form th:action="@{/save/}" method="POST" th:object="${car}">
-    <input type="hidden" id="id" name="id" th:field="${id}">
+<form th:action="@{/save}" method="POST" th:object="${car}">
+    <input type="hidden" id="id" name="id" th:field="*{id}">
 
     <label for="spz">SPZ number</label>
     <input type="text" id="spz" name="spz" th:field="*{spz}">
 
     <label for="color">Color</label>
-    <input type="text" id="color" name="color" th:fied="*{color}">
+    <input type="text" id="color" name="color" th:field="*{color}">
 
     <label for="numberOfSeats">Number of seats</label>
     <input type="number" id="numberOfSeats" name="numberOfSeats" th:field="*{numberOfSeats}">
